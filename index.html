@@ -32,12 +32,11 @@ body{
 .wrap{max-width:1100px; margin:0 auto; min-height:100dvh;}
 
 /* ── HEADER ── */
-.hdr-wrap{position:fixed; top:0; left:0; right:0; z-index:50;}
+.hdr-wrap{position:fixed; top:0; left:0; right:0; z-index:50; box-shadow:0 2px 12px rgba(12,68,124,.18);}
 .header{
   background:var(--sky800);
   padding:max(12px,env(safe-area-inset-top)) 16px 12px;
   display:flex; align-items:center; justify-content:space-between;
-  box-shadow:0 2px 12px rgba(12,68,124,.25);
   max-width:1100px; margin:0 auto;
 }
 .header-left{display:flex; align-items:center; gap:10px; flex-shrink:0;}
@@ -63,14 +62,16 @@ body{
 .last-update{font-size:10.5px; color:rgba(255,255,255,.75);}
 @keyframes spin-icon{to{transform:rotate(360deg)}}
 .spinning{animation:spin-icon .8s linear infinite; display:inline-block;}
+/* ── 데모 배너 (KPI 위, 스크롤 따라가는 일반 흐름) ── */
+.demo-banner{background:#FFF3CD;color:#7B5200;font-size:12px;font-weight:700;text-align:center;padding:6px 12px;border-bottom:1px solid #FAC775;display:none;max-width:1100px;margin:0 auto;}
+.demo-banner.on{display:block;}
 
 /* ── TAB NAV (텍스트 전용 · 이모지/아이콘/SVG 미사용) ── */
-.top-nav{background:var(--card);border-bottom:1.5px solid var(--border);display:flex;padding:0 6px;box-shadow:0 2px 8px rgba(55,138,221,.07);max-width:1100px;margin:0 auto;}
+.top-nav{background:var(--sky50);border-bottom:1.5px solid var(--border);display:flex;padding:0 6px;max-width:1100px;margin:0 auto;}
 .tab-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;border:none;background:transparent;color:var(--txt2);font-size:13.5px;font-weight:700;font-family:inherit;cursor:pointer;padding:12px 4px;-webkit-tap-highlight-color:transparent;transition:color .15s;position:relative;white-space:nowrap}
 .tab-btn.on{color:var(--sky600)}
 .tab-btn.on::after{content:'';position:absolute;bottom:0;left:12%;right:12%;height:2.5px;background:var(--sky);border-radius:2px 2px 0 0}
 .tab-btn:hover:not(.on){color:var(--txt)}
-.tab-cnt{font-size:11px;font-weight:700;background:var(--sky50);color:var(--sky600);border-radius:10px;padding:1px 7px;}
 
 /* ── MAIN ── */
 .main{padding:14px;}
@@ -91,8 +92,7 @@ body{
 .toolbar{background:var(--card);border:1px solid var(--border);border-radius:var(--r12);padding:11px 13px;margin-bottom:14px;box-shadow:var(--shadow)}
 .f-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .f-sel-wrap{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px}
-@media(min-width:601px){.f-sel-wrap{grid-template-columns:repeat(4,1fr)}}
-.f-sel{padding:7px 10px;border-radius:var(--r8);border:1.5px solid var(--border);font-size:13px;font-family:inherit;color:var(--txt);background:var(--card);outline:none;cursor:pointer;flex:1;min-width:0;transition:border .15s;text-overflow:ellipsis}
+.f-sel{padding:7px 10px;border-radius:var(--r8);border:1.5px solid var(--border);font-size:13px;font-family:inherit;color:var(--txt);background:var(--card);outline:none;cursor:pointer;flex:1;min-width:0;transition:border .15s}
 .f-sel:focus{border-color:var(--sky);box-shadow:0 0 0 3px rgba(55,138,221,.1)}
 .f-sel.active{border-color:var(--sky);color:var(--sky600);font-weight:700;background:var(--sky50)}
 .f-active-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
@@ -203,14 +203,12 @@ tbody tr:hover{background:var(--sky50)}
   .issue-grid{grid-template-columns:1fr}
   .kpi-card{min-width:66px;padding:9px 7px}
   .kpi-card .num{font-size:18px}
-  .f-lbl{min-width:38px;font-size:11px}
-  .f-chip{font-size:11.5px;padding:6px 10px;min-height:34px}
   .dash-grid{grid-template-columns:1fr}
   .bar-row{grid-template-columns:72px 1fr auto}
   .bar-lbl{font-size:11px}
   .tab-btn{font-size:12px;gap:3px}
-  .tab-cnt{font-size:10px;padding:1px 5px}
 }
+@media(min-width:601px){.f-sel-wrap{grid-template-columns:repeat(4,1fr)}}
 @media(min-width:769px){.logo-title{font-size:18px}}
 </style>
 </head>
@@ -228,7 +226,7 @@ tbody tr:hover{background:var(--sky50)}
       <div class="modal-field">
         <label class="modal-label">Cloudflare Worker URL</label>
         <input id="cfgWorkerUrl" class="modal-input" type="text" placeholder="https://your-worker.workers.dev"/>
-        <div class="modal-hint">Notion API 프록시 주소 · 저장값은 XX로 마스킹 표시</div>
+        <div class="modal-hint">Notion API 프록시 주소 · 저장값은 XX로 마스킹 표시 · 브라우저 localStorage에 평문 저장됩니다 (개인 기기 권장)</div>
       </div>
       <div class="modal-field">
         <label class="modal-label">주식이슈 DB ID</label>
@@ -274,12 +272,13 @@ tbody tr:hover{background:var(--sky50)}
       </div>
     </div>
     <div class="top-nav" id="nav" role="tablist" aria-label="주식 이슈 탭">
-      <button class="tab-btn on" data-tab="dash" id="tab-dash" role="tab" aria-selected="true" aria-controls="panel-dash">요약 <span class="tab-cnt" id="cntDash">0</span></button>
-      <button class="tab-btn" data-tab="issue" id="tab-issue" role="tab" aria-selected="false" aria-controls="panel-issue">이슈 <span class="tab-cnt" id="cntIssue">0</span></button>
-      <button class="tab-btn" data-tab="volume" id="tab-volume" role="tab" aria-selected="false" aria-controls="panel-volume">거래대금 <span class="tab-cnt" id="cntVol">0</span></button>
+      <button class="tab-btn on" data-tab="dash" id="tab-dash" role="tab" aria-selected="true" aria-controls="panel-dash">요약</button>
+      <button class="tab-btn" data-tab="issue" id="tab-issue" role="tab" aria-selected="false" aria-controls="panel-issue">이슈</button>
+      <button class="tab-btn" data-tab="volume" id="tab-volume" role="tab" aria-selected="false" aria-controls="panel-volume">거래대금</button>
     </div>
   </div>
 
+  <div class="demo-banner" id="demoBanner">● 데모 데이터 표시 중 — 설정에서 Notion DB를 연결하세요</div>
   <div class="main" id="main">
     <div class="panel on" id="panel-dash" role="tabpanel" aria-labelledby="tab-dash" tabindex="0"></div>
     <div class="panel" id="panel-issue" role="tabpanel" aria-labelledby="tab-issue" tabindex="0"></div>
@@ -311,26 +310,28 @@ let VOLUMES = [];
 let curTab = 'dash';
 
 // ── 필터/정렬 상태 ──
-let F = { dir:'', sector:'', trig:'', strength:'', date:'', q:'' };
+let F = { dir:'', sector:'', trig:'', strength:'', date:'', q:'', year:'', month:'' };
 let SORT = 'score';
 let VOL_DATE = '';
+let VOL_YEAR = '';
+let VOL_MONTH = '';
 let IS_DEMO = false;
 
 // ── 데모 내장 데이터 (Worker 미연결/로드 실패 시 미리보기용) ──
 // 2026-06-08: 브로드컴 쇼크발 코스피 급락일(일부 실데이터 반영) / 2026-06-05: 대표 샘플
 const DEMO_ISSUES = [
-  {name:'삼성전자',code:'005930',date:'2026-06-08',chg:-5.54,close:68500,dir:'급락',sector:'AI반도체',trig:'글로벌증시',strength:'🔴 핵심',summary:'브로드컴 쇼크·외국인 매도, 코스피 5.5% 급락 직격탄',detail:'미국 5월 비농업 고용 서프라이즈로 금리인상 우려가 재점화. 나스닥 -4.18%·필라델피아 반도체 -10.26% 폭락에 외국인 대량 매도가 겹치며 코스피 대장주가 직격탄을 맞음.',src:'https://www.hankyung.com/article/2026060822316',score:97},
-  {name:'SK하이닉스',code:'000660',date:'2026-06-08',chg:-7.68,close:188000,dir:'급락',sector:'AI반도체',trig:'글로벌증시',strength:'🔴 핵심',summary:'미 반도체 쇼크 동조, HBM 대장주 급락',detail:'마이크론 -13.3%·SOX -10.26% 등 미 반도체 폭락에 동조. HBM 업황 둔화 우려가 재부각되며 외국인 매도 집중.',src:'https://www.hankyung.com/article/2026060822316',score:95},
-  {name:'현대차',code:'005380',date:'2026-06-08',chg:-8.71,close:231000,dir:'급락',sector:'자율주행',trig:'글로벌증시',strength:'🔴 핵심',summary:'글로벌 증시 급락 속 대형주 동반 하락',detail:'브로드컴 쇼크발 미 증시 급락에 코스피가 8% 넘게 폭락. 자동차 고유 악재보다 시장 전체 투매 성격으로 서킷브레이커 발동.',src:'https://www.hankyung.com/article/2026060822316',score:88},
-  {name:'SK스퀘어',code:'402340',date:'2026-06-08',chg:-11.13,close:109000,dir:'급락',sector:'AI반도체',trig:'글로벌증시',strength:'🟡 보통',summary:'SK하이닉스 지분 보유 지주사 반도체 쇼크 동반 급락',detail:'SK하이닉스 지분을 핵심 자산으로 보유한 지주사로서 반도체 쇼크 여파에 동조. 지분가치 디스카운트가 부각되며 낙폭이 SK하이닉스보다 크게 나타남.',src:'https://www.hankyung.com/article/2026060822316',score:62},
-  {name:'두산로보틱스',code:'454910',date:'2026-06-08',chg:-9.34,close:63900,dir:'급락',sector:'로봇·자동화',trig:'글로벌증시',strength:'🟡 보통',summary:'직전 20% 급등 후 반도체 쇼크 여파 동반 조정',detail:'6월 2일 엔비디아 협업 기대로 20% 급등해 신고가 근접 이후, 브로드컴 쇼크발 투자심리 경색으로 차익실현 물량 출회.',src:'https://www.hankyung.com/article/2026060822316',score:60},
-  {name:'NAVER',code:'035420',date:'2026-06-08',chg:-5.54,close:205000,dir:'급락',sector:'AI반도체',trig:'글로벌증시',strength:'🟡 보통',summary:'AI 기술주 분류, 코스피 낙폭에 동조 하락',detail:'시장 전반 매도 속 AI 기술주로 분류되어 코스피 지수 낙폭(-5.54%)에 준하는 동조 하락.',src:'https://www.hankyung.com/article/2026060822316',score:54},
-  {name:'HD현대중공업',code:'329180',date:'2026-06-08',chg:2.04,close:352000,dir:'급등',sector:'조선·해양',trig:'수급',strength:'🟠 강함',summary:'반도체 쏠림 회피 자금 유입, 비반도체 우량주 강세',detail:'코스피가 반도체 대형주 중심으로 급락하는 가운데 오히려 +2% 상승. 삼성전자·SK하이닉스 비중 쏠림 리스크가 부각되며 비반도체 우량주로 자금이 이동.',src:'https://www.hankyung.com/article/2026060822316',score:71},
-  {name:'두산에너빌리티',code:'034020',date:'2026-06-05',chg:6.42,close:42500,dir:'급등',sector:'원전·SMR',trig:'정책',strength:'🟠 강함',summary:'체코 원전 본계약 기대감에 원전주 강세',detail:'체코 신규 원전 본계약 임박 보도에 원전·SMR 밸류체인 전반이 강세. AI 데이터센터 전력수요 확대 기대도 동반.',src:'https://www.hankyung.com/article/2026060512345',score:78},
-  {name:'한화오션',code:'042660',date:'2026-06-05',chg:5.13,close:71000,dir:'급등',sector:'조선·해양',trig:'수주',strength:'🟠 강함',summary:'미 해군 MRO 우선협상 기대에 조선주 급등',detail:'미 해군 함정 정비(MRO) 우선협상 대상자 선정 기대감 부각. 특수선 수주잔고 확대 전망에 매수세 유입.',src:'https://www.hankyung.com/article/2026060512346',score:72},
-  {name:'알테오젠',code:'196170',date:'2026-06-05',chg:7.81,close:335000,dir:'급등',sector:'바이오·제약',trig:'실적',strength:'🟡 보통',summary:'기술수출 마일스톤 유입 기대에 바이오 강세',detail:'주력 파이프라인 기술수출 마일스톤 인식 기대감에 강세. 코스닥 제약·바이오 투자심리 개선과 동반 상승.',src:'https://www.hankyung.com/article/2026060512347',score:58},
-  {name:'에코프로비엠',code:'247540',date:'2026-06-05',chg:-4.23,close:128000,dir:'급락',sector:'2차전지',trig:'수급',strength:'🟡 보통',summary:'전기차 수요 둔화 우려에 2차전지 약세',detail:'유럽·미국 전기차 판매 둔화 지표와 양극재 단가 하락 우려가 겹치며 2차전지 소재주 전반 약세.',src:'https://www.hankyung.com/article/2026060512348',score:51},
-  {name:'한화에어로스페이스',code:'012450',date:'2026-06-05',chg:3.61,close:695000,dir:'급등',sector:'방산·드론',trig:'수주',strength:'🟠 강함',summary:'폴란드 K9 2차 계약 진전 기대에 방산 강세',detail:'폴란드 K9 자주포 2차 실행계약 협상 진전 보도에 방산 대표주가 강세. 수출 모멘텀 지속 기대.',src:'https://www.hankyung.com/article/2026060512349',score:68},
+  {name:'삼성전자',code:'005930',date:'2026-06-08',chg:-5.54,close:68500,dir:'급락',sector:'AI반도체',trig:'글로벌증시',strength:'🔴 핵심',summary:'브로드컴 쇼크·외국인 매도, 코스피 5.5% 급락 직격탄',detail:'미국 5월 비농업 고용 서프라이즈로 금리인상 우려가 재점화. 나스닥 -4.18%·필라델피아 반도체 -10.26% 폭락에 외국인 대량 매도가 겹치며 코스피 대장주가 직격탄을 맞음.',src:'',score:97},
+  {name:'SK하이닉스',code:'000660',date:'2026-06-08',chg:-7.68,close:188000,dir:'급락',sector:'AI반도체',trig:'글로벌증시',strength:'🔴 핵심',summary:'미 반도체 쇼크 동조, HBM 대장주 급락',detail:'마이크론 -13.3%·SOX -10.26% 등 미 반도체 폭락에 동조. HBM 업황 둔화 우려가 재부각되며 외국인 매도 집중.',src:'',score:95},
+  {name:'현대차',code:'005380',date:'2026-06-08',chg:-8.71,close:231000,dir:'급락',sector:'자율주행',trig:'글로벌증시',strength:'🔴 핵심',summary:'글로벌 증시 급락 속 대형주 동반 하락',detail:'브로드컴 쇼크발 미 증시 급락에 코스피가 8% 넘게 폭락. 자동차 고유 악재보다 시장 전체 투매 성격으로 서킷브레이커 발동.',src:'',score:88},
+  {name:'SK스퀘어',code:'402340',date:'2026-06-08',chg:-11.13,close:109000,dir:'급락',sector:'AI반도체',trig:'글로벌증시',strength:'🟡 보통',summary:'SK하이닉스 지분 보유 지주사 반도체 쇼크 동반 급락',detail:'SK하이닉스 지분을 핵심 자산으로 보유한 지주사로서 반도체 쇼크 여파에 동조. 지분가치 디스카운트가 부각되며 낙폭이 SK하이닉스보다 크게 나타남.',src:'',score:62},
+  {name:'두산로보틱스',code:'454910',date:'2026-06-08',chg:-9.34,close:63900,dir:'급락',sector:'로봇·자동화',trig:'글로벌증시',strength:'🟡 보통',summary:'직전 20% 급등 후 반도체 쇼크 여파 동반 조정',detail:'6월 2일 엔비디아 협업 기대로 20% 급등해 신고가 근접 이후, 브로드컴 쇼크발 투자심리 경색으로 차익실현 물량 출회.',src:'',score:60},
+  {name:'NAVER',code:'035420',date:'2026-06-08',chg:-5.54,close:205000,dir:'급락',sector:'AI반도체',trig:'글로벌증시',strength:'🟡 보통',summary:'AI 기술주 분류, 코스피 낙폭에 동조 하락',detail:'시장 전반 매도 속 AI 기술주로 분류되어 코스피 지수 낙폭(-5.54%)에 준하는 동조 하락.',src:'',score:54},
+  {name:'HD현대중공업',code:'329180',date:'2026-06-08',chg:2.04,close:352000,dir:'급등',sector:'조선·해양',trig:'수급',strength:'🟠 강함',summary:'반도체 쏠림 회피 자금 유입, 비반도체 우량주 강세',detail:'코스피가 반도체 대형주 중심으로 급락하는 가운데 오히려 +2% 상승. 삼성전자·SK하이닉스 비중 쏠림 리스크가 부각되며 비반도체 우량주로 자금이 이동.',src:'',score:71},
+  {name:'두산에너빌리티',code:'034020',date:'2026-06-05',chg:6.42,close:42500,dir:'급등',sector:'원전·SMR',trig:'정책',strength:'🟠 강함',summary:'체코 원전 본계약 기대감에 원전주 강세',detail:'체코 신규 원전 본계약 임박 보도에 원전·SMR 밸류체인 전반이 강세. AI 데이터센터 전력수요 확대 기대도 동반.',src:'',score:78},
+  {name:'한화오션',code:'042660',date:'2026-06-05',chg:5.13,close:71000,dir:'급등',sector:'조선·해양',trig:'수주',strength:'🟠 강함',summary:'미 해군 MRO 우선협상 기대에 조선주 급등',detail:'미 해군 함정 정비(MRO) 우선협상 대상자 선정 기대감 부각. 특수선 수주잔고 확대 전망에 매수세 유입.',src:'',score:72},
+  {name:'알테오젠',code:'196170',date:'2026-06-05',chg:7.81,close:335000,dir:'급등',sector:'바이오·제약',trig:'실적',strength:'🟡 보통',summary:'기술수출 마일스톤 유입 기대에 바이오 강세',detail:'주력 파이프라인 기술수출 마일스톤 인식 기대감에 강세. 코스닥 제약·바이오 투자심리 개선과 동반 상승.',src:'',score:58},
+  {name:'에코프로비엠',code:'247540',date:'2026-06-05',chg:-4.23,close:128000,dir:'급락',sector:'2차전지',trig:'수급',strength:'🟡 보통',summary:'전기차 수요 둔화 우려에 2차전지 약세',detail:'유럽·미국 전기차 판매 둔화 지표와 양극재 단가 하락 우려가 겹치며 2차전지 소재주 전반 약세.',src:'',score:51},
+  {name:'한화에어로스페이스',code:'012450',date:'2026-06-05',chg:3.61,close:695000,dir:'급등',sector:'방산·드론',trig:'수주',strength:'🟠 강함',summary:'폴란드 K9 2차 계약 진전 기대에 방산 강세',detail:'폴란드 K9 자주포 2차 실행계약 협상 진전 보도에 방산 대표주가 강세. 수출 모멘텀 지속 기대.',src:'',score:68},
 ];
 const DEMO_VOLUMES = [
   {name:'삼성전자',code:'005930',date:'2026-06-08',rank:1,mkt:'KOSPI',close:68500,chg:-5.54,vol:32000000,amt:2190000000000},
@@ -478,6 +479,11 @@ function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;',
 function fmtDate(d){ if(!d) return '-'; const m=d.match(/^(\d{4})-(\d{2})-(\d{2})/); return m?m[2]+'/'+m[3]:d; }
 function distinctDatesDesc(rows){ return [...new Set(rows.map(r=>r.date).filter(Boolean))].sort((a,b)=>b.localeCompare(a)); }
 
+// ── 년/월 계층 날짜 헬퍼 ──
+function getYears(dates){ return [...new Set(dates.map(d=>d.slice(0,4)))].sort((a,b)=>b.localeCompare(a)); }
+function getMonths(dates, year){ return [...new Set(dates.filter(d=>d.startsWith(year)).map(d=>d.slice(0,7)))].sort((a,b)=>b.localeCompare(a)); }
+function getDays(dates, ym){ return dates.filter(d=>d.startsWith(ym)).sort((a,b)=>b.localeCompare(a)); }
+
 // 에러 메시지 → 사용자 친화 문구
 function friendlyErr(msg){
   msg = msg||'오류';
@@ -565,11 +571,23 @@ function renderIssues(){
   var panel = document.getElementById('panel-issue');
   if(!ISSUES.length){ panel.innerHTML = emptyOrSkeleton('이슈'); return; }
   var dates = distinctDatesDesc(ISSUES);
-  // 초기 진입 시 최신 날짜 자동선택
-  if(!F.date && dates.length) F.date = dates[0];
+  var years = getYears(dates);
+  if(!F.year && years.length) F.year = years[0];
+  var months = F.year ? getMonths(dates, F.year) : [];
+  if(!F.month && months.length) F.month = months[0];
+  var days = (F.year && F.month) ? getDays(dates, F.month) : [];
+  // 날짜 필터 기본값: 전체(빈 문자열) — 특정 날짜를 강제 선택하지 않음
   var rows = filteredIssues();
-  var dateOpts = dates.map(function(d){ return '<option value="'+d+'"'+(F.date===d?' selected':'')+'>'+d+'</option>'; }).join('');
-
+  var yearOpts = years.map(function(y){
+    return '<option value="'+y+'"'+(F.year===y?' selected':'')+'>'+y+'년</option>';
+  }).join('');
+  var monthOpts = months.map(function(m){
+    return '<option value="'+m+'"'+(F.month===m?' selected':'')+'>'+Number(m.slice(5))+'월</option>';
+  }).join('');
+  var dayOpts = '<option value=""'+(F.date===''?' selected':'')+'>전체</option>'
+    + days.map(function(d){
+        return '<option value="'+d+'"'+(F.date===d?' selected':'')+'>'+d.slice(8)+'일</option>';
+      }).join('');
   var html = ''
   + '<div id="issue-kpi">'+issueKpiHtml(rows)+'</div>'
   + '<div class="toolbar">'
@@ -580,23 +598,23 @@ function renderIssues(){
   +     fSel('트리거','trig',['전체'].concat(TRIGS))
   +   '</div>'
   +   activeChipsHtml()
-  +   '<div class="f-row">'
-  +     '<select class="sel" onchange="setF(\'date\',this.value)">'
-  +       '<option value=""'+(F.date===''?' selected':'')+'>전체 날짜</option>'
-  +       dateOpts
-  +     '</select>'
+  +   '<div class="f-row" style="gap:7px;flex-wrap:wrap">'
+  +     '<select class="sel" style="min-width:80px" onchange="setIssueYear(this.value)">'+yearOpts+'</select>'
+  +     '<select class="sel" style="min-width:60px" onchange="setIssueMonth(this.value)">'+monthOpts+'</select>'
+  +     '<select class="sel" style="min-width:60px" onchange="setIssueDay(this.value)">'+dayOpts+'</select>'
   +     '<select class="sel" onchange="setSort(this.value)">'
   +       '<option value="score"'+(SORT==='score'?' selected':'')+'>점수순</option>'
   +       '<option value="date"'+(SORT==='date'?' selected':'')+'>최신순</option>'
   +       '<option value="chg"'+(SORT==='chg'?' selected':'')+'>등락률순</option>'
   +       '<option value="strength"'+(SORT==='strength'?' selected':'')+'>강도순</option>'
   +     '</select>'
+  +   '</div>'
+  +   '<div class="f-row" style="margin-top:7px">'
   +     '<input class="search-box" type="text" placeholder="종목·키워드 검색" value="'+esc(F.q)+'" oninput="setQ(this.value)"/>'
   +     '<button class="reset-btn" onclick="resetF()">초기화</button>'
   +   '</div>'
   + '</div>'
   + '<div id="issue-results">'+issueResultsHtml(rows)+'</div>';
-
   panel.innerHTML = html;
 }
 function refreshIssues(){
@@ -605,12 +623,19 @@ function refreshIssues(){
   const r = document.getElementById('issue-results'); if(r) r.innerHTML = issueResultsHtml(rows);
 }
 
+// 컬러값 whitelist 검증 — Notion 데이터에서 악의적 CSS 주입 방어
+function safeColor(hex){ return /^#[0-9A-Fa-f]{3,8}$/.test(hex) ? hex : '#7E8CA0'; }
+
 function issueCard(r){
   const badges = [];
-  if(r.dir) badges.push('<span class="bdg" style="background:'+withAlpha(DIR_COLOR[r.dir]||'#7E8CA0')+';color:'+(DIR_COLOR[r.dir]||'#7E8CA0')+'">'+esc(r.dir)+'</span>');
-  if(r.strength) badges.push('<span class="bdg" style="background:'+withAlpha(STRENGTH_COLOR[r.strength]||'#94A3B8')+';color:'+(STRENGTH_COLOR[r.strength]||'#94A3B8')+'">'+esc(r.strength)+'</span>');
-  if(r.sector) badges.push('<span class="bdg" style="background:'+withAlpha(SECTOR_COLOR[r.sector]||'#7E8CA0')+';color:'+(SECTOR_COLOR[r.sector]||'#7E8CA0')+'">'+esc(r.sector)+'</span>');
-  if(r.trig) badges.push('<span class="bdg" style="background:'+withAlpha(TRIG_COLOR[r.trig]||'#7E8CA0')+';color:'+(TRIG_COLOR[r.trig]||'#7E8CA0')+'">'+esc(r.trig)+'</span>');
+  const c1=safeColor(DIR_COLOR[r.dir]||'#7E8CA0');
+  const c2=safeColor(STRENGTH_COLOR[r.strength]||'#94A3B8');
+  const c3=safeColor(SECTOR_COLOR[r.sector]||'#7E8CA0');
+  const c4=safeColor(TRIG_COLOR[r.trig]||'#7E8CA0');
+  if(r.dir) badges.push('<span class="bdg" style="background:'+withAlpha(c1)+';color:'+c1+'">'+esc(r.dir)+'</span>');
+  if(r.strength) badges.push('<span class="bdg" style="background:'+withAlpha(c2)+';color:'+c2+'">'+esc(r.strength)+'</span>');
+  if(r.sector) badges.push('<span class="bdg" style="background:'+withAlpha(c3)+';color:'+c3+'">'+esc(r.sector)+'</span>');
+  if(r.trig) badges.push('<span class="bdg" style="background:'+withAlpha(c4)+';color:'+c4+'">'+esc(r.trig)+'</span>');
   const meta = ['<span><b>'+fmtDate(r.date)+'</b></span>'];
   if(r.close!=null) meta.push('<span>종가 <b>'+fmtNum(r.close)+'</b></span>');
   const safeSrc = safeUrl(r.src);
@@ -624,17 +649,32 @@ function issueCard(r){
   +   (r.summary?'<div class="ic-summary">'+esc(r.summary)+'</div>':'')
   +   (r.detail?'<div class="ic-detail">'+esc(r.detail)+'</div>':'')
   +   '<div class="ic-foot">'
-  +     '<div class="ic-meta">'+meta.join('')+(r.score!=null?'<span class="ic-score">점수 '+r.score+'</span>':'')+'</div>'
+  +     '<div class="ic-meta">'+meta.join('')+(r.score!=null&&!isNaN(Number(r.score))?'<span class="ic-score">점수 '+Number(r.score)+'</span>':'')+'</div>'
   +     (safeSrc?'<a class="ic-src" href="'+esc(safeSrc)+'" target="_blank" rel="noopener">기사 →</a>':'')
   +   '</div>'
   + '</div>';
 }
 
-function setF(k,v){ F[k]=v; renderIssues(); }
-function setSort(v){ SORT=v; renderIssues(); }
+function setF(k,v){ F[k]=v; refreshIssues(); }
+function setSort(v){ SORT=v; refreshIssues(); }
 function setQ(v){ F.q=v; refreshIssues(); }
-function resetF(){ F={dir:'',sector:'',trig:'',strength:'',date:'',q:''}; SORT='score'; renderIssues(); }
-// resetF 후 renderIssues 내부에서 F.date가 ''이면 최신 날짜로 자동채움
+function resetF(){ F={dir:'',sector:'',trig:'',strength:'',date:'',q:'',year:'',month:''}; SORT='score'; renderIssues(); }
+function setIssueDay(d){ F.date=d; refreshIssues(); }
+function setIssueYear(y){
+  F.year=y; F.month=''; F.date='';
+  var dates=distinctDatesDesc(ISSUES);
+  var months=getMonths(dates,y);
+  if(months.length){ F.month=months[0]; var days=getDays(dates,months[0]); if(days.length) F.date=days[0]; }
+  renderIssues();
+}
+function setIssueMonth(m){
+  F.month=m; F.date='';
+  var dates=distinctDatesDesc(ISSUES);
+  var days=getDays(dates,m);
+  if(days.length) F.date=days[0];
+  renderIssues();
+}
+// resetF 후 renderIssues 내부에서 자동채움
 
 function emptyOrSkeleton(label){
   if(!CFG.workerUrl) return '<div class="empty"><div class="ico">🔌</div><div class="msg">Notion DB가 연결되지 않았습니다</div><div class="sub">우측 상단 <b>설정</b>에서 Worker URL을 입력하세요</div></div>';
@@ -648,7 +688,16 @@ function renderVolume(){
   const panel = document.getElementById('panel-volume');
   if(!VOLUMES.length){ panel.innerHTML = (!CFG.workerUrl)?emptyOrSkeleton('거래대금'):'<div class="sc"><div class="skel" style="height:300px"></div></div>'; return; }
   const dates = distinctDatesDesc(VOLUMES);
-  if(!VOL_DATE || !dates.includes(VOL_DATE)) VOL_DATE = dates[0];
+  // 년/월/일 계층 자동선택
+  var volYears = getYears(dates);
+  if(!VOL_YEAR && volYears.length) VOL_YEAR = volYears[0];
+  var volMonths = VOL_YEAR ? getMonths(dates, VOL_YEAR) : [];
+  if(!VOL_MONTH && volMonths.length) VOL_MONTH = volMonths[0];
+  var volDays = (VOL_YEAR && VOL_MONTH) ? getDays(dates, VOL_MONTH) : [];
+  if(!VOL_DATE && volDays.length) VOL_DATE = volDays[0];
+  if(VOL_DATE && !dates.includes(VOL_DATE)) VOL_DATE = volDays[0]||'';
+  // 방어: VOL_DATE가 여전히 빈 문자열이면 가장 최근 날짜로 강제 설정
+  if(!VOL_DATE && dates.length) VOL_DATE = dates[0];
   let rows = VOLUMES.filter(r=>r.date===VOL_DATE).sort((a,b)=>(a.rank??999)-(b.rank??999));
   const issueKey = new Set(ISSUES.filter(i=>i.date===VOL_DATE).map(i=>i.code||i.name));
   const totalAmt = rows.reduce((s,r)=>s+(r.amt||0),0);
@@ -657,22 +706,24 @@ function renderVolume(){
   const avgChg = rows.length? rows.reduce((s,r)=>s+(r.chg||0),0)/rows.length : 0;
   const top = rows.slice(0,15);
   const maxAmt = Math.max.apply(null, top.map(r=>r.amt||0).concat([1]));
-
+  var volYearOpts = volYears.map(function(y){ return '<option value="'+y+'" '+(VOL_YEAR===y?'selected':'')+'>'+y+'년</option>'; }).join('');
+  var volMonthOpts = volMonths.map(function(m){ return '<option value="'+m+'" '+(VOL_MONTH===m?'selected':'')+'>'+Number(m.slice(5))+'월</option>'; }).join('');
+  var volDayOpts = volDays.map(function(d){ return '<option value="'+d+'" '+(VOL_DATE===d?'selected':'')+'>'+d.slice(8)+'일</option>'; }).join('');
   let html = ''
   + '<div class="kpi-row">'
   +   '<div class="kpi-card kpi-amt"><div class="num">'+fmtAmt(totalAmt)+'</div><div class="lbl">거래대금 합계</div></div>'
   +   '<div class="kpi-card kpi-up"><div class="num">'+upN+'</div><div class="lbl">상승</div></div>'
   +   '<div class="kpi-card kpi-down"><div class="num">'+downN+'</div><div class="lbl">하락</div></div>'
-  +   '<div class="kpi-card '+(avgChg>=0?'kpi-up':'kpi-down')+'"><div class="num">'+fmtPct(avgChg)+'</div><div class="lbl">평균 등락률</div></div>'
+  +   '<div class="kpi-card '+(avgChg>=0?'kpi-up':'kpi-down')+'">'+'<div class="num">'+fmtPct(avgChg)+'</div><div class="lbl">평균 등락률</div></div>'
   + '</div>'
-  + '<div class="f-row" style="margin-bottom:14px">'
-  +   '<select class="sel" onchange="setVolDate(this.value)">'
-  +     dates.map(d=>'<option value="'+d+'" '+(VOL_DATE===d?'selected':'')+'>'+d+'</option>').join('')
-  +   '</select>'
+  + '<div class="f-row" style="margin-bottom:14px;gap:7px;flex-wrap:wrap">'
+  +   '<select class="sel" style="min-width:80px" onchange="setVolYear(this.value)">'+volYearOpts+'</select>'
+  +   '<select class="sel" style="min-width:60px" onchange="setVolMonth(this.value)">'+volMonthOpts+'</select>'
+  +   '<select class="sel" style="min-width:60px" onchange="setVolDate(this.value)">'+volDayOpts+'</select>'
   +   '<span class="filter-count">'+rows.length+'개 종목 · 거래대금 상위</span>'
   + '</div>'
   + '<div class="sc">'
-  +   '<div class="sc-title">거래대금 상위 15 <span class="sub">'+VOL_DATE+'</span></div>'
+  +   '<div class="sc-title">거래대금 상위 '+top.length+' <span class="sub">'+VOL_DATE+'</span></div>'
   +   '<div class="bars">'
   +     top.map(r=>{
           const w=Math.max((r.amt||0)/maxAmt*100,1);
@@ -708,10 +759,32 @@ function renderVolume(){
   panel.innerHTML = html;
 }
 function setVolDate(d){ VOL_DATE=d; renderVolume(); }
+function setVolYear(y){
+  VOL_YEAR=y; VOL_MONTH=''; VOL_DATE='';
+  var dates=distinctDatesDesc(VOLUMES);
+  var months=getMonths(dates,y);
+  if(months.length){ VOL_MONTH=months[0]; var days=getDays(dates,months[0]); if(days.length) VOL_DATE=days[0]; }
+  renderVolume();
+}
+function setVolMonth(m){
+  VOL_MONTH=m; VOL_DATE='';
+  var dates=distinctDatesDesc(VOLUMES);
+  var days=getDays(dates,m);
+  if(days.length) VOL_DATE=days[0];
+  renderVolume();
+}
 function jumpIssue(key){
-  F={dir:'',sector:'',trig:'',strength:'',date:'',q:''};
+  F={dir:'',sector:'',trig:'',strength:'',date:'',q:'',year:'',month:''};
   const it = ISSUES.find(i=>(i.code||i.name)===key);
-  if(it){ F.q = it.name; }
+  if(it){
+    F.q = it.name;
+    // 이슈가 특정 날짜에만 있을 경우 해당 날짜로 필터 복원
+    if(it.date){
+      F.year  = it.date.slice(0,4);
+      F.month = it.date.slice(0,7);
+      F.date  = it.date;
+    }
+  }
   document.querySelector('.tab-btn[data-tab="issue"]').click();
 }
 
@@ -732,12 +805,13 @@ function renderDash(){
   const upT = dirM['급등']||0, downT = dirM['급락']||0;
   const coreT = strM['🔴 핵심']||0;
   const dateCnt = {}; ISSUES.forEach(r=>{ if(r.date) dateCnt[r.date]=(dateCnt[r.date]||0)+1; });
+  // sort()로 날짜 오름차순 정렬 후 slice — trendVals는 반드시 trendDates 기반으로 매핑
   const trendDates = Object.keys(dateCnt).sort().slice(-14);
-  const trendVals = trendDates.map(d=>dateCnt[d]);
+  const trendVals = trendDates.map(d=>dateCnt[d]||0);
 
   function distBars(map, colorMap, order){
     const keys = (order||Object.keys(map)).filter(k=>map[k]);
-    const extra = Object.keys(map).filter(k=>!keys.includes(k));
+    const extra = Object.keys(map).filter(k=>!keys.includes(k) && map[k]>0);
     const all = keys.concat(extra);
     const max = Math.max.apply(null, all.map(k=>map[k]).concat([1]));
     return '<div class="dist">'+all.map(k=>{
@@ -855,13 +929,11 @@ function loadDemo(reason){
   IS_DEMO = true;
   ISSUES = DEMO_ISSUES.slice();
   VOLUMES = DEMO_VOLUMES.slice();
-  document.getElementById('cntIssue').textContent = ISSUES.length;
-  const _cd2=document.getElementById('cntDash'); if(_cd2) _cd2.textContent=distinctDatesDesc(ISSUES).length+'일';
-  document.getElementById('cntVol').textContent = distinctDatesDesc(VOLUMES).length+'일';
   VOL_DATE='';
   if(curTab==='dash') renderDash(); else if(curTab==='issue') renderIssues(); else renderVolume();
   const lu=document.getElementById('lastUpdate'); if(lu){ lu.textContent='● 데모 데이터 (미연결)'; lu.style.color='rgba(255,214,150,.95)'; }
   const dot=document.getElementById('cfgDot'); if(dot) dot.classList.add('off');
+  const banner=document.getElementById('demoBanner'); if(banner) banner.classList.add('on');
   toast('데모 데이터 표시 — '+(reason||'미리보기용'));
 }
 
@@ -890,12 +962,11 @@ async function loadData(){
     // 새 데이터에 없는 날짜 필터는 초기화 (빈 화면 방지)
     const allDates = distinctDatesDesc(ISSUES);
     if(F.date && !allDates.includes(F.date)) F.date='';
-    document.getElementById('cntIssue').textContent = ISSUES.length;
-    const _cd=document.getElementById('cntDash'); if(_cd) _cd.textContent=distinctDatesDesc(ISSUES).length+'일';
-    document.getElementById('cntVol').textContent = distinctDatesDesc(VOLUMES).length+'일';
     VOL_DATE='';
     if(curTab==='dash') renderDash(); else if(curTab==='issue') renderIssues(); else renderVolume();
     updateCfgStatus(true);
+    IS_DEMO = false;
+    const banner=document.getElementById('demoBanner'); if(banner) banner.classList.remove('on');
     toast(errs.length ? ('일부 로드 실패 — '+errs.join(' / ')) : ('로드 완료 — 이슈 '+ISSUES.length+'건 · 거래대금 '+VOLUMES.length+'건'));
   }catch(e){
     loadDemo(friendlyErr(e.message));
@@ -904,12 +975,15 @@ async function loadData(){
   }
 }
 
-// ── 헤더 높이 보정 ──
+// ── 헤더 높이 보정 (ResizeObserver 단일 등록, 미지원 시 resize 폴백) ──
 function applyHeaderOffset(){ const h=document.querySelector('.hdr-wrap'), m=document.getElementById('main'); if(h&&m) m.style.paddingTop=(h.offsetHeight+8)+'px'; }
-applyHeaderOffset();
-window.addEventListener('resize', applyHeaderOffset);
-if(document.fonts&&document.fonts.ready) document.fonts.ready.then(applyHeaderOffset);
-if(typeof ResizeObserver!=='undefined'){ const el=document.querySelector('.hdr-wrap'); if(el) new ResizeObserver(applyHeaderOffset).observe(el); }
+if(typeof ResizeObserver!=='undefined'){
+  const el=document.querySelector('.hdr-wrap');
+  if(el){ new ResizeObserver(applyHeaderOffset).observe(el); applyHeaderOffset(); }
+} else {
+  applyHeaderOffset();
+  window.addEventListener('resize', applyHeaderOffset);
+}
 
 // ── 초기 진입 ──
 (function init(){
