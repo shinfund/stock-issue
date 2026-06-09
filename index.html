@@ -106,11 +106,11 @@ body{
 
 /* ── ISSUE CARDS ── */
 .issue-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px}
-.issue-card{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--sky);border-radius:var(--r12);padding:14px 15px;box-shadow:var(--shadow);transition:.15s;position:relative}
+.issue-card{background:var(--card);border:1px solid var(--border);border-top:3.5px solid var(--sky);border-radius:var(--r12);padding:13px 14px;box-shadow:var(--shadow);transition:.15s;position:relative}
 .issue-card:hover{box-shadow:var(--shadow-hover);transform:translateY(-2px)}
-.issue-card.dir-급등{border-left-color:var(--red)}
-.issue-card.dir-급락{border-left-color:var(--blue)}
-.issue-card.dir-보합{border-left-color:var(--gray600)}
+.issue-card.dir-급등{border-top-color:var(--red)}
+.issue-card.dir-급락{border-top-color:var(--blue)}
+.issue-card.dir-보합{border-top-color:var(--gray600)}
 .ic-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
 .ic-name{font-size:16px;font-weight:800;letter-spacing:-.02em}
 .ic-code{font-size:11px;color:var(--txt3);font-weight:600;margin-left:5px}
@@ -118,8 +118,12 @@ body{
 .ic-chg.up{color:var(--red)} .ic-chg.down{color:var(--blue)} .ic-chg.flat{color:var(--gray600)}
 .ic-badges{display:flex;gap:5px;flex-wrap:wrap;margin:9px 0 8px}
 .bdg{font-size:10.5px;font-weight:800;padding:2.5px 8px;border-radius:11px;letter-spacing:-.02em;white-space:nowrap}
-.ic-summary{font-size:13.5px;font-weight:700;color:var(--txt);line-height:1.5;margin-bottom:4px}
-.ic-detail{font-size:12.5px;color:var(--txt2);line-height:1.55}
+.ic-summary{font-size:13.5px;font-weight:700;color:var(--txt);line-height:1.5;margin-bottom:0}
+.ic-divider{border:none;border-top:1px dashed var(--border);margin:7px 0}
+.ic-detail{font-size:12.5px;color:var(--txt2);line-height:1.6;margin:0;padding:0;list-style:none}
+.ic-detail li{position:relative;padding-left:14px;margin-bottom:3px}
+.ic-detail li:last-child{margin-bottom:0}
+.ic-detail li::before{content:'•';position:absolute;left:0;top:0;color:var(--sky);font-size:14px;line-height:1.6;font-weight:900}
 .ic-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding-top:9px;border-top:1px dashed var(--border)}
 .ic-meta{font-size:11px;color:var(--txt3);font-weight:600;display:flex;gap:9px;flex-wrap:wrap}
 .ic-meta b{color:var(--txt2)}
@@ -138,9 +142,11 @@ thead th.l{text-align:left}
 tbody td{padding:9px 8px;border-bottom:1px solid var(--border2);text-align:right;white-space:nowrap}
 tbody td.l{text-align:left}
 tbody tr:hover{background:var(--sky50)}
-.t-rank{font-weight:800;color:var(--txt3);width:38px}
-.t-name{font-weight:700}
+.t-rank{font-weight:800;color:var(--txt3);width:26px;padding-left:4px!important;padding-right:4px!important}
+.t-name{font-weight:700;max-width:0;width:99%}
 .t-name .c{font-size:10.5px;color:var(--txt3);font-weight:600;margin-left:4px}
+.t-chg{white-space:nowrap;min-width:60px}
+.t-amt{white-space:nowrap;min-width:72px}
 .t-up{color:var(--red);font-weight:700} .t-down{color:var(--blue);font-weight:700}
 .t-mkt{font-size:10.5px;font-weight:700;padding:1.5px 7px;border-radius:9px;background:var(--gray50);color:var(--gray600)}
 .t-issue{cursor:pointer}
@@ -148,8 +154,8 @@ tbody tr:hover{background:var(--sky50)}
 
 /* ── BAR CHART (horizontal) ── */
 .bars{display:flex;flex-direction:column;gap:7px}
-.bar-row{display:grid;grid-template-columns:88px 1fr auto;align-items:center;gap:9px}
-.bar-lbl{font-size:12px;font-weight:700;color:var(--txt2);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-row{display:grid;grid-template-columns:max-content 1fr auto;align-items:center;gap:9px}
+.bar-lbl{font-size:12px;font-weight:700;color:var(--txt2);text-align:left;white-space:nowrap}
 .bar-track{background:var(--bg);border-radius:6px;height:18px;overflow:hidden}
 .bar-fill{height:100%;border-radius:6px;transition:width .5s;min-width:2px}
 .bar-val{font-size:11.5px;font-weight:800;color:var(--txt2);min-width:30px;text-align:right}
@@ -157,8 +163,8 @@ tbody tr:hover{background:var(--sky50)}
 /* ── DISTRIBUTION GRID ── */
 .dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
 .dist{display:flex;flex-direction:column;gap:8px}
-.dist-row{display:grid;grid-template-columns:84px 1fr 34px;align-items:center;gap:9px}
-.dist-lbl{font-size:12px;font-weight:700;color:var(--txt2);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dist-row{display:grid;grid-template-columns:max-content 1fr 34px;align-items:center;gap:9px}
+.dist-lbl{font-size:12px;font-weight:700;color:var(--txt2);text-align:left;white-space:nowrap}
 .dist-track{background:var(--bg);border-radius:6px;height:16px;overflow:hidden}
 .dist-fill{height:100%;border-radius:6px}
 .dist-val{font-size:11.5px;font-weight:800;color:var(--txt3);text-align:right}
@@ -205,6 +211,9 @@ tbody tr:hover{background:var(--sky50)}
   .bar-row{grid-template-columns:72px 1fr auto}
   .bar-lbl{font-size:11px}
   .tab-btn{font-size:12px;gap:3px}
+  table{font-size:12px}
+  thead th,tbody td{padding:7px 5px}
+  .t-name .c{display:none}
 }
 @media(min-width:601px){.f-sel-wrap{grid-template-columns:repeat(4,1fr)}}
 @media(min-width:769px){.logo-title{font-size:18px}}
@@ -657,7 +666,8 @@ function issueCard(r){
   +   '</div>'
   +   '<div class="ic-badges">'+badges.join('')+'</div>'
   +   (r.summary?'<div class="ic-summary">'+esc(r.summary)+'</div>':'')
-  +   (r.detail?'<div class="ic-detail">'+esc(r.detail)+'</div>':'')
+  +   (r.summary&&r.detail?'<div class="ic-divider"></div>':'')
+  +   (r.detail?'<ul class="ic-detail">'+r.detail.split(/[.。]\s*/).filter(s=>s.trim()).map(s=>'<li>'+esc(s.trim())+'</li>').join('')+'</ul>':'')
   +   '<div class="ic-foot">'
   +     '<div class="ic-meta">'+meta.join('')+(r.score!=null&&!isNaN(Number(r.score))?'<span class="ic-score">점수 '+Number(r.score)+'</span>':'')+'</div>'
   +     (safeSrc?'<a class="ic-src" href="'+esc(safeSrc)+'" target="_blank" rel="noopener">기사 →</a>':'')
@@ -747,15 +757,16 @@ function renderVolume(){
   + '<div class="sc">'
   +   '<div class="sc-title">전체 순위 <span class="sub">🔖 = 이슈 등록 종목 (클릭 시 이슈 탭으로)</span></div>'
   +   '<div class="tbl-wrap"><table>'
-  +     '<thead><tr><th>순위</th><th class="l">종목</th><th>등락률</th><th>거래대금</th></tr></thead>'
+  +     '<colgroup><col style="width:28px"><col><col style="width:64px"><col style="width:80px"></colgroup>'
+  +     '<thead><tr><th style="padding-left:4px;padding-right:4px">순위</th><th class="l">종목</th><th>등락률</th><th>거래대금</th></tr></thead>'
   +     '<tbody>'
   +       rows.map(r=>{
             const k=r.code||r.name; const hasIssue=issueKey.has(k);
             return '<tr class="'+(hasIssue?'t-issue':'')+'" '+(hasIssue?'onclick="jumpIssue(\''+esc(k)+'\')"':'')+'>'
               + '<td class="t-rank">'+(r.rank??'-')+'</td>'
               + '<td class="l t-name">'+(hasIssue?'<span class="t-flag">🔖 </span>':'')+esc(r.name)+'<span class="c">'+esc(r.code)+'</span></td>'
-              + '<td class="'+dirCls(r.chg||0)+'">'+fmtPct(r.chg)+'</td>'
-              + '<td>'+fmtAmt(r.amt)+'</td>'
+              + '<td class="'+dirCls(r.chg||0)+' t-chg">'+fmtPct(r.chg)+'</td>'
+              + '<td class="t-amt">'+fmtAmt(r.amt)+'</td>'
             + '</tr>';
           }).join('')
   +     '</tbody>'
@@ -863,9 +874,9 @@ function todaysSummary(rows){
   const sorted = [...rows].sort((a,b)=>(b.score??-1e9)-(a.score??-1e9)).slice(0,6);
   return '<div class="bars">'+sorted.map(r=>{
     const col = DIR_COLOR[r.dir]||'#7E8CA0';
-    return '<div class="bar-row" style="grid-template-columns:96px 1fr auto;cursor:pointer" onclick="jumpIssue(\''+esc(r.code||r.name)+'\')">'
-      + '<div class="bar-lbl" title="'+esc(r.name)+'" style="color:'+col+'">'+esc(r.name)+'</div>'
-      + '<div style="font-size:12px;color:var(--txt2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(r.summary||r.detail||'')+'</div>'
+    return '<div class="bar-row" style="grid-template-columns:max-content 1fr auto;gap:9px;cursor:pointer" onclick="jumpIssue(\''+esc(r.code||r.name)+'\')">'
+      + '<div style="font-size:12.5px;font-weight:800;color:'+col+';white-space:nowrap;flex-shrink:0">'+esc(r.name)+'</div>'
+      + '<div style="font-size:12px;color:var(--txt2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">'+esc(r.summary||r.detail||'')+'</div>'
       + '<div class="bar-val" style="color:'+chgColor(r.chg)+'">'+fmtPct(r.chg)+'</div>'
     + '</div>';
   }).join('')+'</div>';
