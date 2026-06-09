@@ -62,25 +62,23 @@ body{
 .last-update{font-size:10.5px; color:rgba(255,255,255,.75);}
 @keyframes spin-icon{to{transform:rotate(360deg)}}
 .spinning{animation:spin-icon .8s linear infinite; display:inline-block;}
-/* ── 데모 배너 (KPI 위, 스크롤 따라가는 일반 흐름) ── */
-.demo-banner{background:#FFF3CD;color:#7B5200;font-size:12px;font-weight:700;text-align:center;padding:6px 12px;border-bottom:1px solid #FAC775;display:none;max-width:1100px;margin:0 auto;}
-.demo-banner.on{display:block;}
+
 
 /* ── TAB NAV (텍스트 전용 · 이모지/아이콘/SVG 미사용) ── */
-.top-nav{background:var(--sky50);border-bottom:1.5px solid var(--border);display:flex;padding:0 6px;max-width:1100px;margin:0 auto;}
+.top-nav{background:#fff;border-bottom:1.5px solid var(--border);display:flex;padding:0 6px;max-width:1100px;margin:0 auto;}
 .tab-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;border:none;background:transparent;color:var(--txt2);font-size:13.5px;font-weight:700;font-family:inherit;cursor:pointer;padding:12px 4px;-webkit-tap-highlight-color:transparent;transition:color .15s;position:relative;white-space:nowrap}
 .tab-btn.on{color:var(--sky600)}
 .tab-btn.on::after{content:'';position:absolute;bottom:0;left:12%;right:12%;height:2.5px;background:var(--sky);border-radius:2px 2px 0 0}
 .tab-btn:hover:not(.on){color:var(--txt)}
 
 /* ── MAIN ── */
-.main{padding:14px;}
+.main{padding:0 14px 14px;}
 .panel{display:none;}
 .panel.on{display:block;animation:fade .25s;}
 @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
 /* ── KPI ── */
-.kpi-row{display:flex;gap:9px;margin-bottom:14px;flex-wrap:wrap}
+.kpi-row{display:flex;gap:9px;margin-top:0;margin-bottom:14px;padding-top:6px;flex-wrap:wrap}
 .kpi-card{flex:1;min-width:76px;background:var(--card);border:1px solid var(--border);border-radius:var(--r12);padding:11px 12px;text-align:center;box-shadow:var(--shadow)}
 .kpi-card .num{font-size:21px;font-weight:900;line-height:1.05}
 .kpi-card .lbl{font-size:11.5px;margin-top:4px;font-weight:600;color:var(--txt3)}
@@ -278,7 +276,6 @@ tbody tr:hover{background:var(--sky50)}
     </div>
   </div>
 
-  <div class="demo-banner" id="demoBanner">● 데모 데이터 표시 중 — 설정에서 Notion DB를 연결하세요</div>
   <div class="main" id="main">
     <div class="panel on" id="panel-dash" role="tabpanel" aria-labelledby="tab-dash" tabindex="0"></div>
     <div class="panel" id="panel-issue" role="tabpanel" aria-labelledby="tab-issue" tabindex="0"></div>
@@ -290,6 +287,8 @@ tbody tr:hover{background:var(--sky50)}
 // ════════════════════════════════════════════════
 // 설정 — Notion 연동 (Cloudflare Worker 프록시)
 // ════════════════════════════════════════════════
+// ⚠ 보안 안내: Worker URL·DB ID는 소스에 노출됩니다.
+//   Worker 측에서 CORS Origin 제한 + Rate-Limit + DB ID 서버 고정으로 보호하세요.
 const DEFAULT_WORKER = 'https://notion-proxy.shinfund.workers.dev';
 const DEF_ISSUE_DB   = '2e2fceec-ae43-492d-95d4-edfadb5f8581'; // 주식이슈DB
 const DEF_VOLUME_DB  = '36159c8c-9c0a-806b-8840-000bfa2867a7'; // 주식거래대금상위DB
@@ -483,6 +482,15 @@ function distinctDatesDesc(rows){ return [...new Set(rows.map(r=>r.date).filter(
 function getYears(dates){ return [...new Set(dates.map(d=>d.slice(0,4)))].sort((a,b)=>b.localeCompare(a)); }
 function getMonths(dates, year){ return [...new Set(dates.filter(d=>d.startsWith(year)).map(d=>d.slice(0,7)))].sort((a,b)=>b.localeCompare(a)); }
 function getDays(dates, ym){ return dates.filter(d=>d.startsWith(ym)).sort((a,b)=>b.localeCompare(a)); }
+// 년/월/일 계층 한 번에 반환 — renderIssues·renderVolume·setVolYear 공통 사용
+function buildDateHierarchy(dates, year, month){
+  const years = getYears(dates);
+  const y = year || (years[0]||'');
+  const months = y ? getMonths(dates, y) : [];
+  const m = month || (months[0]||'');
+  const days = m ? getDays(dates, m) : [];
+  return {years, months, days, year:y, month:m};
+}
 
 // 에러 메시지 → 사용자 친화 문구
 function friendlyErr(msg){
@@ -503,6 +511,7 @@ document.getElementById('nav').addEventListener('click', e=>{
   document.querySelectorAll('.tab-btn').forEach(b=>{ const on=b===btn; b.classList.toggle('on', on); b.setAttribute('aria-selected', on?'true':'false'); });
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
   document.getElementById('panel-'+curTab).classList.add('on');
+  window.scrollTo({top:0, behavior:'smooth'}); // 탭 전환 시 스크롤 상단 복원
   if(curTab==='issue') renderIssues();
   else if(curTab==='volume') renderVolume();
   else renderDash();
@@ -576,7 +585,8 @@ function renderIssues(){
   var months = F.year ? getMonths(dates, F.year) : [];
   if(!F.month && months.length) F.month = months[0];
   var days = (F.year && F.month) ? getDays(dates, F.month) : [];
-  // 날짜 필터 기본값: 전체(빈 문자열) — 특정 날짜를 강제 선택하지 않음
+  // 초기 진입 시 최신 날짜 자동 선택 — 년/월 드롭다운 변경 후에는 전체 유지
+  if(!F._dateInit && days.length){ F.date = days[0]; F._dateInit = true; }
   var rows = filteredIssues();
   var yearOpts = years.map(function(y){
     return '<option value="'+y+'"'+(F.year===y?' selected':'')+'>'+y+'년</option>';
@@ -658,27 +668,24 @@ function issueCard(r){
 function setF(k,v){ F[k]=v; refreshIssues(); }
 function setSort(v){ SORT=v; refreshIssues(); }
 function setQ(v){ F.q=v; refreshIssues(); }
-function resetF(){ F={dir:'',sector:'',trig:'',strength:'',date:'',q:'',year:'',month:''}; SORT='score'; renderIssues(); }
+function resetF(){ F={dir:'',sector:'',trig:'',strength:'',date:'',q:'',year:'',month:'',_dateInit:false}; SORT='score'; renderIssues(); }
 function setIssueDay(d){ F.date=d; refreshIssues(); }
 function setIssueYear(y){
   F.year=y; F.month=''; F.date='';
   var dates=distinctDatesDesc(ISSUES);
   var months=getMonths(dates,y);
-  if(months.length){ F.month=months[0]; var days=getDays(dates,months[0]); if(days.length) F.date=days[0]; }
+  if(months.length){ F.month=months[0]; } // F.date는 전체(빈) 유지
   renderIssues();
 }
 function setIssueMonth(m){
-  F.month=m; F.date='';
-  var dates=distinctDatesDesc(ISSUES);
-  var days=getDays(dates,m);
-  if(days.length) F.date=days[0];
+  F.month=m; F.date=''; // F.date는 전체(빈) 유지 — 강제 일자 선택 제거
   renderIssues();
 }
 // resetF 후 renderIssues 내부에서 자동채움
 
 function emptyOrSkeleton(label){
   if(!CFG.workerUrl) return '<div class="empty"><div class="ico">🔌</div><div class="msg">Notion DB가 연결되지 않았습니다</div><div class="sub">우측 상단 <b>설정</b>에서 Worker URL을 입력하세요</div></div>';
-  return '<div class="issue-grid">'+'<div class="skel"></div>'.repeat(6)+'</div>';
+  return '<div class="empty"><div class="ico">⏳</div><div class="msg">'+label+' 데이터 불러오는 중…</div></div>';
 }
 
 // ════════════════════════════════════════════════
@@ -704,7 +711,8 @@ function renderVolume(){
   const upN = rows.filter(r=>r.chg>0).length;
   const downN = rows.filter(r=>r.chg<0).length;
   const avgChg = rows.length? rows.reduce((s,r)=>s+(r.chg||0),0)/rows.length : 0;
-  const top = rows.slice(0,15);
+  const BAR_TOP_N = 20; // 바차트 표시 상위 건수 (전체 순위 테이블은 rows 전체 표시)
+  const top = rows.slice(0, BAR_TOP_N);
   const maxAmt = Math.max.apply(null, top.map(r=>r.amt||0).concat([1]));
   var volYearOpts = volYears.map(function(y){ return '<option value="'+y+'" '+(VOL_YEAR===y?'selected':'')+'>'+y+'년</option>'; }).join('');
   var volMonthOpts = volMonths.map(function(m){ return '<option value="'+m+'" '+(VOL_MONTH===m?'selected':'')+'>'+Number(m.slice(5))+'월</option>'; }).join('');
@@ -720,7 +728,7 @@ function renderVolume(){
   +   '<select class="sel" style="min-width:80px" onchange="setVolYear(this.value)">'+volYearOpts+'</select>'
   +   '<select class="sel" style="min-width:60px" onchange="setVolMonth(this.value)">'+volMonthOpts+'</select>'
   +   '<select class="sel" style="min-width:60px" onchange="setVolDate(this.value)">'+volDayOpts+'</select>'
-  +   '<span class="filter-count">'+rows.length+'개 종목 · 거래대금 상위</span>'
+  +   ''
   + '</div>'
   + '<div class="sc">'
   +   '<div class="sc-title">거래대금 상위 '+top.length+' <span class="sub">'+VOL_DATE+'</span></div>'
@@ -739,17 +747,14 @@ function renderVolume(){
   + '<div class="sc">'
   +   '<div class="sc-title">전체 순위 <span class="sub">🔖 = 이슈 등록 종목 (클릭 시 이슈 탭으로)</span></div>'
   +   '<div class="tbl-wrap"><table>'
-  +     '<thead><tr><th>순위</th><th class="l">종목</th><th>시장</th><th>종가</th><th>등락률</th><th>거래량</th><th>거래대금</th></tr></thead>'
+  +     '<thead><tr><th>순위</th><th class="l">종목</th><th>등락률</th><th>거래대금</th></tr></thead>'
   +     '<tbody>'
   +       rows.map(r=>{
             const k=r.code||r.name; const hasIssue=issueKey.has(k);
             return '<tr class="'+(hasIssue?'t-issue':'')+'" '+(hasIssue?'onclick="jumpIssue(\''+esc(k)+'\')"':'')+'>'
               + '<td class="t-rank">'+(r.rank??'-')+'</td>'
               + '<td class="l t-name">'+(hasIssue?'<span class="t-flag">🔖 </span>':'')+esc(r.name)+'<span class="c">'+esc(r.code)+'</span></td>'
-              + '<td><span class="t-mkt">'+esc(r.mkt||'-')+'</span></td>'
-              + '<td>'+fmtNum(r.close)+'</td>'
               + '<td class="'+dirCls(r.chg||0)+'">'+fmtPct(r.chg)+'</td>'
-              + '<td>'+fmtNum(r.vol)+'</td>'
               + '<td>'+fmtAmt(r.amt)+'</td>'
             + '</tr>';
           }).join('')
@@ -774,17 +779,18 @@ function setVolMonth(m){
   renderVolume();
 }
 function jumpIssue(key){
+  // F 리셋 후 즉시 값 설정 — 탭 클릭(renderIssues) 전에 완료되어야 기본값 덮어쓰기 방지
   F={dir:'',sector:'',trig:'',strength:'',date:'',q:'',year:'',month:''};
   const it = ISSUES.find(i=>(i.code||i.name)===key);
   if(it){
     F.q = it.name;
-    // 이슈가 특정 날짜에만 있을 경우 해당 날짜로 필터 복원
     if(it.date){
       F.year  = it.date.slice(0,4);
       F.month = it.date.slice(0,7);
       F.date  = it.date;
     }
   }
+  // F 완전 설정 후 탭 전환 — renderIssues 내 if(!F.year) 분기를 안전하게 통과
   document.querySelector('.tab-btn[data-tab="issue"]').click();
 }
 
@@ -804,9 +810,12 @@ function renderDash(){
   const dirM = countBy(ISSUES,'dir');
   const upT = dirM['급등']||0, downT = dirM['급락']||0;
   const coreT = strM['🔴 핵심']||0;
+  const todayUp   = todays.filter(r=>r.dir==='급등').length;
+  const todayDown = todays.filter(r=>r.dir==='급락').length;
+  const todayCore = todays.filter(r=>r.strength==='🔴 핵심').length;
   const dateCnt = {}; ISSUES.forEach(r=>{ if(r.date) dateCnt[r.date]=(dateCnt[r.date]||0)+1; });
-  // sort()로 날짜 오름차순 정렬 후 slice — trendVals는 반드시 trendDates 기반으로 매핑
-  const trendDates = Object.keys(dateCnt).sort().slice(-14);
+  const TREND_DAYS = 14; // 추이 차트 표시 일수
+  const trendDates = Object.keys(dateCnt).sort().slice(-TREND_DAYS);
   const trendVals = trendDates.map(d=>dateCnt[d]||0);
 
   function distBars(map, colorMap, order){
@@ -827,11 +836,10 @@ function renderDash(){
 
   let html = ''
   + '<div class="kpi-row">'
-  +   '<div class="kpi-card kpi-tot"><div class="num">'+ISSUES.length+'</div><div class="lbl">누적 이슈</div></div>'
-  +   '<div class="kpi-card kpi-teal"><div class="num">'+dates.length+'</div><div class="lbl">기록 일수</div></div>'
-  +   '<div class="kpi-card kpi-up"><div class="num">'+upT+'</div><div class="lbl">급등</div></div>'
-  +   '<div class="kpi-card kpi-down"><div class="num">'+downT+'</div><div class="lbl">급락</div></div>'
-  +   '<div class="kpi-card kpi-core"><div class="num">'+coreT+'</div><div class="lbl">🔴 핵심</div></div>'
+  +   '<div class="kpi-card kpi-tot"><div class="num">'+todays.length+'</div><div class="lbl">이슈</div></div>'
+  +   '<div class="kpi-card kpi-up"><div class="num">'+todayUp+'</div><div class="lbl">급등</div></div>'
+  +   '<div class="kpi-card kpi-down"><div class="num">'+todayDown+'</div><div class="lbl">급락</div></div>'
+  +   '<div class="kpi-card kpi-core"><div class="num">'+todayCore+'</div><div class="lbl">🔴 핵심</div></div>'
   + '</div>'
   + '<div class="sc">'
   +   '<div class="sc-title">최근 시황 <span class="sub">'+latest+' · '+todays.length+'건</span></div>'
@@ -842,10 +850,10 @@ function renderDash(){
   +   '<div class="trend-wrap">'+trendSvg(trendDates, trendVals)+'</div>'
   + '</div>'
   + '<div class="dash-grid">'
-  +   '<div class="sc"><div class="sc-title">섹터 분포</div>'+distBars(secM, SECTOR_COLOR, SECTORS)+'</div>'
-  +   '<div class="sc"><div class="sc-title">이슈강도 분포</div>'+distBars(strM, STRENGTH_COLOR, STRENGTHS)+'</div>'
-  +   '<div class="sc"><div class="sc-title">트리거 분포</div>'+distBars(trM, TRIG_COLOR, TRIGS)+'</div>'
-  +   '<div class="sc"><div class="sc-title">방향 분포</div>'+distBars(dirM, DIR_COLOR, DIRS)+'</div>'
+  +   '<div class="sc"><div class="sc-title">섹터 분포 <span class="sub">전체 기간</span></div>'+distBars(secM, SECTOR_COLOR, SECTORS)+'</div>'
+  +   '<div class="sc"><div class="sc-title">이슈강도 분포 <span class="sub">전체 기간</span></div>'+distBars(strM, STRENGTH_COLOR, STRENGTHS)+'</div>'
+  +   '<div class="sc"><div class="sc-title">트리거 분포 <span class="sub">전체 기간</span></div>'+distBars(trM, TRIG_COLOR, TRIGS)+'</div>'
+  +   '<div class="sc"><div class="sc-title">방향 분포 <span class="sub">전체 기간</span></div>'+distBars(dirM, DIR_COLOR, DIRS)+'</div>'
   + '</div>';
   panel.innerHTML = html;
 }
@@ -865,6 +873,7 @@ function todaysSummary(rows){
 
 function trendSvg(dates, vals){
   if(!dates.length) return '';
+  if(dates.length === 1) return '<div class="empty" style="padding:20px"><div class="msg" style="font-size:13px;color:var(--txt3)">추이 데이터 1일 — 2일 이상 누적 시 차트 표시</div></div>';
   const W=Math.max(dates.length*46, 320), H=170, padL=28,padR=12,padT=14,padB=30;
   const iw=W-padL-padR, ih=H-padT-padB;
   const max=Math.max.apply(null, vals.concat([1]));
@@ -910,6 +919,7 @@ function saveCfg(){
   const i=document.getElementById('cfgIssueDbId').value.trim();
   const v=document.getElementById('cfgVolumeDbId').value.trim();
   if(w) CFG.workerUrl=w; if(i) CFG.issueDbId=i; if(v) CFG.volumeDbId=v;
+  // 개인 기기: localStorage(브라우저 종료 후에도 유지) / 공용 기기: sessionStorage(탭 닫으면 삭제)
   try{ localStorage.setItem('si_workerUrl',CFG.workerUrl); localStorage.setItem('si_issueDbId',CFG.issueDbId); localStorage.setItem('si_volumeDbId',CFG.volumeDbId); }catch(e){}
   closeCfgModal(); loadData();
 }
@@ -933,7 +943,6 @@ function loadDemo(reason){
   if(curTab==='dash') renderDash(); else if(curTab==='issue') renderIssues(); else renderVolume();
   const lu=document.getElementById('lastUpdate'); if(lu){ lu.textContent='● 데모 데이터 (미연결)'; lu.style.color='rgba(255,214,150,.95)'; }
   const dot=document.getElementById('cfgDot'); if(dot) dot.classList.add('off');
-  const banner=document.getElementById('demoBanner'); if(banner) banner.classList.add('on');
   toast('데모 데이터 표시 — '+(reason||'미리보기용'));
 }
 
@@ -965,8 +974,6 @@ async function loadData(){
     VOL_DATE='';
     if(curTab==='dash') renderDash(); else if(curTab==='issue') renderIssues(); else renderVolume();
     updateCfgStatus(true);
-    IS_DEMO = false;
-    const banner=document.getElementById('demoBanner'); if(banner) banner.classList.remove('on');
     toast(errs.length ? ('일부 로드 실패 — '+errs.join(' / ')) : ('로드 완료 — 이슈 '+ISSUES.length+'건 · 거래대금 '+VOLUMES.length+'건'));
   }catch(e){
     loadDemo(friendlyErr(e.message));
@@ -976,7 +983,7 @@ async function loadData(){
 }
 
 // ── 헤더 높이 보정 (ResizeObserver 단일 등록, 미지원 시 resize 폴백) ──
-function applyHeaderOffset(){ const h=document.querySelector('.hdr-wrap'), m=document.getElementById('main'); if(h&&m) m.style.paddingTop=(h.offsetHeight+8)+'px'; }
+function applyHeaderOffset(){ const h=document.querySelector('.hdr-wrap'), m=document.getElementById('main'); if(h&&m) m.style.paddingTop=(h.offsetHeight)+'px'; }
 if(typeof ResizeObserver!=='undefined'){
   const el=document.querySelector('.hdr-wrap');
   if(el){ new ResizeObserver(applyHeaderOffset).observe(el); applyHeaderOffset(); }
