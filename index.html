@@ -552,7 +552,7 @@ function fSel(label, key, opts){
   return s;
 }
 function activeChipsHtml(){
-  var map=[{k:'dir',l:'방향'},{k:'strength',l:'강도'},{k:'sector',l:'섹터'},{k:'trig',l:'트리거'},{k:'date',l:'날짜'}];
+  var map=[{k:'dir',l:'방향'},{k:'strength',l:'강도'},{k:'sector',l:'섹터'},{k:'trig',l:'트리거'}];
   var chips=[];
   for(var i=0;i<map.length;i++){
     var m=map[i];
@@ -563,8 +563,10 @@ function activeChipsHtml(){
 function renderIssues(){
   var panel = document.getElementById('panel-issue');
   if(!ISSUES.length){ panel.innerHTML = emptyOrSkeleton('이슈'); return; }
-  var rows = filteredIssues();
   var dates = distinctDatesDesc(ISSUES);
+  // 초기 진입 시 최신 날짜 자동선택
+  if(!F.date && dates.length) F.date = dates[0];
+  var rows = filteredIssues();
   var dateOpts = dates.map(function(d){ return '<option value="'+d+'"'+(F.date===d?' selected':'')+'>'+d+'</option>'; }).join('');
 
   var html = ''
@@ -631,6 +633,7 @@ function setF(k,v){ F[k]=v; renderIssues(); }
 function setSort(v){ SORT=v; renderIssues(); }
 function setQ(v){ F.q=v; refreshIssues(); }
 function resetF(){ F={dir:'',sector:'',trig:'',strength:'',date:'',q:''}; SORT='score'; renderIssues(); }
+// resetF 후 renderIssues 내부에서 F.date가 ''이면 최신 날짜로 자동채움
 
 function emptyOrSkeleton(label){
   if(!CFG.workerUrl) return '<div class="empty"><div class="ico">🔌</div><div class="msg">Notion DB가 연결되지 않았습니다</div><div class="sub">우측 상단 <b>설정</b>에서 Worker URL을 입력하세요</div></div>';
