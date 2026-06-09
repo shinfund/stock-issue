@@ -90,8 +90,9 @@ body{
 /* ── FILTER ── */
 .toolbar{background:var(--card);border:1px solid var(--border);border-radius:var(--r12);padding:11px 13px;margin-bottom:14px;box-shadow:var(--shadow)}
 .f-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.f-sel-wrap{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px}
-.f-sel{padding:7px 10px;border-radius:var(--r8);border:1.5px solid var(--border);font-size:13px;font-family:inherit;color:var(--txt);background:var(--card);outline:none;cursor:pointer;flex:1;min-width:80px;transition:border .15s}
+.f-sel-wrap{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px}
+@media(min-width:601px){.f-sel-wrap{grid-template-columns:repeat(4,1fr)}}
+.f-sel{padding:7px 10px;border-radius:var(--r8);border:1.5px solid var(--border);font-size:13px;font-family:inherit;color:var(--txt);background:var(--card);outline:none;cursor:pointer;flex:1;min-width:0;transition:border .15s;text-overflow:ellipsis}
 .f-sel:focus{border-color:var(--sky);box-shadow:0 0 0 3px rgba(55,138,221,.1)}
 .f-sel.active{border-color:var(--sky);color:var(--sky600);font-weight:700;background:var(--sky50)}
 .f-active-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
@@ -546,7 +547,7 @@ function fSel(label, key, opts){
   var s = '<select class="f-sel'+(active?' active':'')+'" onchange="setF(\''+key+'\',this.value)" aria-label="'+label+'">';
   for(var i=0;i<opts.length;i++){
     var o=opts[i], val=(o==='전체')?'':o;
-    s += '<option value="'+esc(val)+'"'+(cur===val?' selected':'')+'>'+esc(o==='전체'?label+' 전체':o)+'</option>';
+    s += '<option value="'+esc(val)+'"'+(cur===val?' selected':'')+'>'+esc(o==='전체'?label:o)+'</option>';
   }
   s += '</select>';
   return s;
