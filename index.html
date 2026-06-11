@@ -332,18 +332,18 @@ let IS_DEMO = false;
 // ── 데모 내장 데이터 (Worker 미연결/로드 실패 시 미리보기용) ──
 // 2026-06-08: 브로드컴 쇼크발 코스피 급락일(일부 실데이터 반영) / 2026-06-05: 대표 샘플
 const DEMO_ISSUES = [
-  {name:'삼성전자',code:'005930',date:'2026-06-08',chg:-5.54,close:68500,dir:'급락',sector:'AI반도체',trig:'글로벌증시',strength:'🔴 핵심',summary:'브로드컴 쇼크·외국인 매도, 코스피 5.5% 급락 직격탄',detail:'미국 5월 비농업 고용 서프라이즈로 금리인상 우려가 재점화. 나스닥 -4.18%·필라델피아 반도체 -10.26% 폭락에 외국인 대량 매도가 겹치며 코스피 대장주가 직격탄을 맞음.',src:'',score:97},
-  {name:'SK하이닉스',code:'000660',date:'2026-06-08',chg:-7.68,close:188000,dir:'급락',sector:'AI반도체',trig:'글로벌증시',strength:'🔴 핵심',summary:'미 반도체 쇼크 동조, HBM 대장주 급락',detail:'마이크론 -13.3%·SOX -10.26% 등 미 반도체 폭락에 동조. HBM 업황 둔화 우려가 재부각되며 외국인 매도 집중.',src:'',score:95},
-  {name:'현대차',code:'005380',date:'2026-06-08',chg:-8.71,close:231000,dir:'급락',sector:'자율주행',trig:'글로벌증시',strength:'🔴 핵심',summary:'글로벌 증시 급락 속 대형주 동반 하락',detail:'브로드컴 쇼크발 미 증시 급락에 코스피가 8% 넘게 폭락. 자동차 고유 악재보다 시장 전체 투매 성격으로 서킷브레이커 발동.',src:'',score:88},
-  {name:'SK스퀘어',code:'402340',date:'2026-06-08',chg:-11.13,close:109000,dir:'급락',sector:'AI반도체',trig:'글로벌증시',strength:'🟡 보통',summary:'SK하이닉스 지분 보유 지주사 반도체 쇼크 동반 급락',detail:'SK하이닉스 지분을 핵심 자산으로 보유한 지주사로서 반도체 쇼크 여파에 동조. 지분가치 디스카운트가 부각되며 낙폭이 SK하이닉스보다 크게 나타남.',src:'',score:62},
-  {name:'두산로보틱스',code:'454910',date:'2026-06-08',chg:-9.34,close:63900,dir:'급락',sector:'로봇·자동화',trig:'글로벌증시',strength:'🟡 보통',summary:'직전 20% 급등 후 반도체 쇼크 여파 동반 조정',detail:'6월 2일 엔비디아 협업 기대로 20% 급등해 신고가 근접 이후, 브로드컴 쇼크발 투자심리 경색으로 차익실현 물량 출회.',src:'',score:60},
-  {name:'NAVER',code:'035420',date:'2026-06-08',chg:-5.54,close:205000,dir:'급락',sector:'AI반도체',trig:'글로벌증시',strength:'🟡 보통',summary:'AI 기술주 분류, 코스피 낙폭에 동조 하락',detail:'시장 전반 매도 속 AI 기술주로 분류되어 코스피 지수 낙폭(-5.54%)에 준하는 동조 하락.',src:'',score:54},
-  {name:'HD현대중공업',code:'329180',date:'2026-06-08',chg:2.04,close:352000,dir:'급등',sector:'조선·해양',trig:'수급',strength:'🟠 강함',summary:'반도체 쏠림 회피 자금 유입, 비반도체 우량주 강세',detail:'코스피가 반도체 대형주 중심으로 급락하는 가운데 오히려 +2% 상승. 삼성전자·SK하이닉스 비중 쏠림 리스크가 부각되며 비반도체 우량주로 자금이 이동.',src:'',score:71},
-  {name:'두산에너빌리티',code:'034020',date:'2026-06-05',chg:6.42,close:42500,dir:'급등',sector:'원전·SMR',trig:'정책',strength:'🟠 강함',summary:'체코 원전 본계약 기대감에 원전주 강세',detail:'체코 신규 원전 본계약 임박 보도에 원전·SMR 밸류체인 전반이 강세. AI 데이터센터 전력수요 확대 기대도 동반.',src:'',score:78},
-  {name:'한화오션',code:'042660',date:'2026-06-05',chg:5.13,close:71000,dir:'급등',sector:'조선·해양',trig:'수주',strength:'🟠 강함',summary:'미 해군 MRO 우선협상 기대에 조선주 급등',detail:'미 해군 함정 정비(MRO) 우선협상 대상자 선정 기대감 부각. 특수선 수주잔고 확대 전망에 매수세 유입.',src:'',score:72},
-  {name:'알테오젠',code:'196170',date:'2026-06-05',chg:7.81,close:335000,dir:'급등',sector:'바이오·제약',trig:'실적',strength:'🟡 보통',summary:'기술수출 마일스톤 유입 기대에 바이오 강세',detail:'주력 파이프라인 기술수출 마일스톤 인식 기대감에 강세. 코스닥 제약·바이오 투자심리 개선과 동반 상승.',src:'',score:58},
-  {name:'에코프로비엠',code:'247540',date:'2026-06-05',chg:-4.23,close:128000,dir:'급락',sector:'2차전지',trig:'수급',strength:'🟡 보통',summary:'전기차 수요 둔화 우려에 2차전지 약세',detail:'유럽·미국 전기차 판매 둔화 지표와 양극재 단가 하락 우려가 겹치며 2차전지 소재주 전반 약세.',src:'',score:51},
-  {name:'한화에어로스페이스',code:'012450',date:'2026-06-05',chg:3.61,close:695000,dir:'급등',sector:'방산·드론',trig:'수주',strength:'🟠 강함',summary:'폴란드 K9 2차 계약 진전 기대에 방산 강세',detail:'폴란드 K9 자주포 2차 실행계약 협상 진전 보도에 방산 대표주가 강세. 수출 모멘텀 지속 기대.',src:'',score:68},
+  {name:'삼성전자',code:'005930',date:'2026-06-08',chg:-5.54,close:68500,dir:'급락',sector:['AI반도체'],trig:['글로벌증시'],strength:'🔴 핵심',summary:'브로드컴 쇼크·외국인 매도, 코스피 5.5% 급락 직격탄',detail:'미국 5월 비농업 고용 서프라이즈로 금리인상 우려가 재점화. 나스닥 -4.18%·필라델피아 반도체 -10.26% 폭락에 외국인 대량 매도가 겹치며 코스피 대장주가 직격탄을 맞음.',src:'',score:97},
+  {name:'SK하이닉스',code:'000660',date:'2026-06-08',chg:-7.68,close:188000,dir:'급락',sector:['AI반도체'],trig:['글로벌증시'],strength:'🔴 핵심',summary:'미 반도체 쇼크 동조, HBM 대장주 급락',detail:'마이크론 -13.3%·SOX -10.26% 등 미 반도체 폭락에 동조. HBM 업황 둔화 우려가 재부각되며 외국인 매도 집중.',src:'',score:95},
+  {name:'현대차',code:'005380',date:'2026-06-08',chg:-8.71,close:231000,dir:'급락',sector:['자율주행'],trig:['글로벌증시'],strength:'🔴 핵심',summary:'글로벌 증시 급락 속 대형주 동반 하락',detail:'브로드컴 쇼크발 미 증시 급락에 코스피가 8% 넘게 폭락. 자동차 고유 악재보다 시장 전체 투매 성격으로 서킷브레이커 발동.',src:'',score:88},
+  {name:'SK스퀘어',code:'402340',date:'2026-06-08',chg:-11.13,close:109000,dir:'급락',sector:['AI반도체'],trig:['글로벌증시'],strength:'🟡 보통',summary:'SK하이닉스 지분 보유 지주사 반도체 쇼크 동반 급락',detail:'SK하이닉스 지분을 핵심 자산으로 보유한 지주사로서 반도체 쇼크 여파에 동조. 지분가치 디스카운트가 부각되며 낙폭이 SK하이닉스보다 크게 나타남.',src:'',score:62},
+  {name:'두산로보틱스',code:'454910',date:'2026-06-08',chg:-9.34,close:63900,dir:'급락',sector:['로봇·자동화'],trig:['글로벌증시'],strength:'🟡 보통',summary:'직전 20% 급등 후 반도체 쇼크 여파 동반 조정',detail:'6월 2일 엔비디아 협업 기대로 20% 급등해 신고가 근접 이후, 브로드컴 쇼크발 투자심리 경색으로 차익실현 물량 출회.',src:'',score:60},
+  {name:'NAVER',code:'035420',date:'2026-06-08',chg:-5.54,close:205000,dir:'급락',sector:['AI반도체'],trig:['글로벌증시'],strength:'🟡 보통',summary:'AI 기술주 분류, 코스피 낙폭에 동조 하락',detail:'시장 전반 매도 속 AI 기술주로 분류되어 코스피 지수 낙폭(-5.54%)에 준하는 동조 하락.',src:'',score:54},
+  {name:'HD현대중공업',code:'329180',date:'2026-06-08',chg:2.04,close:352000,dir:'급등',sector:['조선·해양'],trig:['수급'],strength:'🟠 강함',summary:'반도체 쏠림 회피 자금 유입, 비반도체 우량주 강세',detail:'코스피가 반도체 대형주 중심으로 급락하는 가운데 오히려 +2% 상승. 삼성전자·SK하이닉스 비중 쏠림 리스크가 부각되며 비반도체 우량주로 자금이 이동.',src:'',score:71},
+  {name:'두산에너빌리티',code:'034020',date:'2026-06-05',chg:6.42,close:42500,dir:'급등',sector:['원전·SMR'],trig:['정책'],strength:'🟠 강함',summary:'체코 원전 본계약 기대감에 원전주 강세',detail:'체코 신규 원전 본계약 임박 보도에 원전·SMR 밸류체인 전반이 강세. AI 데이터센터 전력수요 확대 기대도 동반.',src:'',score:78},
+  {name:'한화오션',code:'042660',date:'2026-06-05',chg:5.13,close:71000,dir:'급등',sector:['조선·해양'],trig:['수주'],strength:'🟠 강함',summary:'미 해군 MRO 우선협상 기대에 조선주 급등',detail:'미 해군 함정 정비(MRO) 우선협상 대상자 선정 기대감 부각. 특수선 수주잔고 확대 전망에 매수세 유입.',src:'',score:72},
+  {name:'알테오젠',code:'196170',date:'2026-06-05',chg:7.81,close:335000,dir:'급등',sector:['바이오·제약'],trig:['실적'],strength:'🟡 보통',summary:'기술수출 마일스톤 유입 기대에 바이오 강세',detail:'주력 파이프라인 기술수출 마일스톤 인식 기대감에 강세. 코스닥 제약·바이오 투자심리 개선과 동반 상승.',src:'',score:58},
+  {name:'에코프로비엠',code:'247540',date:'2026-06-05',chg:-4.23,close:128000,dir:'급락',sector:['2차전지'],trig:['수급'],strength:'🟡 보통',summary:'전기차 수요 둔화 우려에 2차전지 약세',detail:'유럽·미국 전기차 판매 둔화 지표와 양극재 단가 하락 우려가 겹치며 2차전지 소재주 전반 약세.',src:'',score:51},
+  {name:'한화에어로스페이스',code:'012450',date:'2026-06-05',chg:3.61,close:695000,dir:'급등',sector:['방산·드론'],trig:['수주'],strength:'🟠 강함',summary:'폴란드 K9 2차 계약 진전 기대에 방산 강세',detail:'폴란드 K9 자주포 2차 실행계약 협상 진전 보도에 방산 대표주가 강세. 수출 모멘텀 지속 기대.',src:'',score:68},
 ];
 const DEMO_VOLUMES = [
   {name:'삼성전자',code:'005930',date:'2026-06-08',rank:1,mkt:'KOSPI',close:68500,chg:-5.54,vol:32000000,amt:2190000000000},
@@ -415,13 +415,17 @@ function darkShade(hex){
 // Notion fetch
 // ════════════════════════════════════════════════
 async function fetchNotion(dbId, body){
-  const res = await fetch(CFG.workerUrl+'/v1/databases/'+dbId+'/query', {
-    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body||{})
-  });
-  if(!res.ok) throw new Error('HTTP '+res.status);
-  const ct = res.headers.get('content-type')||'';
-  if(!ct.includes('application/json')) throw new Error('Worker URL 오류 — JSON이 아닌 응답');
-  return res.json();
+  const ctrl = new AbortController();
+  const timer = setTimeout(()=>ctrl.abort(), 5000);
+  try{
+    const res = await fetch(CFG.workerUrl+'/v1/databases/'+dbId+'/query', {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body||{}), signal:ctrl.signal
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const ct = res.headers.get('content-type')||'';
+    if(!ct.includes('application/json')) throw new Error('Worker URL 오류 — JSON이 아닌 응답');
+    return res.json();
+  }finally{ clearTimeout(timer); }
 }
 async function fetchAllPages(dbId, sorts){
   const body = { page_size:100 };
@@ -462,8 +466,8 @@ function parseIssues(pages){
       chg:numOr(getVal(pr['등락률'])),
       close:numOr(getVal(pr['종가'])),
       dir:getVal(pr['방향'])||'',
-      sector:getVal(pr['섹터'])||'',
-      trig:getVal(pr['트리거'])||'',
+      sector:[].concat(getVal(pr['섹터'])||[]).filter(Boolean),
+      trig:[].concat(getVal(pr['트리거'])||[]).filter(Boolean),
       strength:getVal(pr['이슈강도'])||'',
       summary:String(getVal(pr['이슈요약'])||'').trim(),
       detail:String(getVal(pr['이슈상세'])||'').trim(),
@@ -554,11 +558,11 @@ document.getElementById('nav').addEventListener('click', e=>{
 function filteredIssues(){
   let rows = ISSUES.filter(r=>{
     if(F.dir && r.dir!==F.dir) return false;
-    if(F.sector && r.sector!==F.sector) return false;
-    if(F.trig && r.trig!==F.trig) return false;
+    if(F.sector && !r.sector.includes(F.sector)) return false;
+    if(F.trig && !r.trig.includes(F.trig)) return false;
     if(F.strength && r.strength!==F.strength) return false;
     if(F.date && r.date!==F.date) return false;
-    if(F.q){ const q=F.q.toLowerCase(); const hay=(r.name+' '+r.code+' '+r.summary+' '+r.detail+' '+r.sector).toLowerCase(); if(!hay.includes(q)) return false; }
+    if(F.q){ const q=F.q.toLowerCase(); const hay=(r.name+' '+r.code+' '+r.summary+' '+r.detail+' '+r.sector.join(' ')+' '+r.trig.join(' ')).toLowerCase(); if(!hay.includes(q)) return false; }
     return true;
   });
   rows.sort((a,b)=>{
@@ -671,12 +675,10 @@ function issueCard(r){
   const badges = [];
   const c1=safeColor(DIR_COLOR[r.dir]||'#7E8CA0');
   const c2=safeColor(STRENGTH_COLOR[r.strength]||'#94A3B8');
-  const c3=safeColor(SECTOR_COLOR[r.sector]||'#7E8CA0');
-  const c4=safeColor(TRIG_COLOR[r.trig]||'#7E8CA0');
   if(r.dir) badges.push('<span class="bdg" style="background:'+withAlpha(c1)+';color:'+darkShade(c1)+'">'+esc(r.dir)+'</span>');
   if(r.strength) badges.push('<span class="bdg" style="background:'+withAlpha(c2)+';color:'+darkShade(c2)+'">'+esc(r.strength)+'</span>');
-  if(r.sector) badges.push('<span class="bdg" style="background:'+withAlpha(c3)+';color:'+darkShade(c3)+'">'+esc(r.sector)+'</span>');
-  if(r.trig) badges.push('<span class="bdg" style="background:'+withAlpha(c4)+';color:'+darkShade(c4)+'">'+esc(r.trig)+'</span>');
+  r.sector.forEach(s=>{ const c=safeColor(SECTOR_COLOR[s]||'#7E8CA0'); badges.push('<span class="bdg" style="background:'+withAlpha(c)+';color:'+darkShade(c)+'">'+esc(s)+'</span>'); });
+  r.trig.forEach(t=>{ const c=safeColor(TRIG_COLOR[t]||'#7E8CA0'); badges.push('<span class="bdg" style="background:'+withAlpha(c)+';color:'+darkShade(c)+'">'+esc(t)+'</span>'); });
   const meta = ['<span><b>'+fmtDate(r.date)+'</b></span>'];
   if(r.close!=null) meta.push('<span>종가 <b>'+fmtNum(r.close)+'</b></span>');
   const safeSrc = safeUrl(r.src);
@@ -837,9 +839,10 @@ function renderDash(){
   const latest = dates[0];
   const todays = ISSUES.filter(r=>r.date===latest);
   const countBy = (rows,key)=>{ const m={}; rows.forEach(r=>{ const v=r[key]||'기타'; m[v]=(m[v]||0)+1; }); return m; };
-  const secM = countBy(ISSUES,'sector');
+  const countByArr = (rows,key)=>{ const m={}; rows.forEach(r=>{ const vs=[].concat(r[key]||[]).filter(Boolean); if(!vs.length){m['기타']=(m['기타']||0)+1;}else{vs.forEach(v=>{m[v]=(m[v]||0)+1;});} }); return m; };
+  const secM = countByArr(ISSUES,'sector');
   const strM = countBy(ISSUES,'strength');
-  const trM = countBy(ISSUES,'trig');
+  const trM = countByArr(ISSUES,'trig');
   const dirM = countBy(ISSUES,'dir');
   const upT = dirM['급등']||0, downT = dirM['급락']||0;
   const coreT = strM['🔴 핵심']||0;
@@ -1028,7 +1031,7 @@ if(typeof ResizeObserver!=='undefined'){
 // ── 초기 진입 ──
 (function init(){
   updateCfgStatus(undefined);
-  if(CFG.workerUrl){ loadData(); }
+  if(CFG.workerUrl){ renderDash(); loadData(); }
   else { loadDemo('설정에서 Notion DB 연결'); renderDash(); }
 })();
 </script>
