@@ -444,6 +444,7 @@ function getVal(p){
     case 'title':     return (p.title||[]).map(t=>t.plain_text||'').join('');
     case 'rich_text': return (p.rich_text||[]).map(t=>t.plain_text||'').join('');
     case 'select':    return p.select?.name || '';
+    case 'multi_select': return (p.multi_select||[]).map(s=>s.name||'').filter(Boolean);
     case 'number':    return (p.number===null||p.number===undefined)?null:p.number;
     case 'url':       return p.url || '';
     case 'date':{ const s=p.date?.start||''; const m=s.match(/^\d{4}-\d{2}-\d{2}/); return m?m[0]:s.slice(0,10); }
